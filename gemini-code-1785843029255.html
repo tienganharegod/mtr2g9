@@ -1,0 +1,1253 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ms Lê Hằng English - Interactive English Practice Test</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+<style>
+  :root {
+    --primary-pink: #FF80BF;
+    --primary-pink-dark: #FF52A3;
+    --pastel-bg: #FFF0F6;
+    --pastel-card: #FFFFFF;
+    --pastel-purple: #D8B4FE;
+    --pastel-green: #00D26A;
+    --pastel-red: #FF4757;
+    --pastel-yellow: #FDCB6E;
+    --text-color: #2D3436;
+    --border-radius: 18px;
+    --box-shadow-3d: 0 6px 0px rgba(0,0,0,0.12);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  /* Dynamic Animated Gradient Background + Floating SVG Pattern */
+  body {
+    background: linear-gradient(-45deg, #FFB6C1, #FFC0CB, #E6E6FA, #FFF0F5, #FFD1DC);
+    background-size: 400% 400%;
+    animation: gradientShift 12s ease infinite;
+    background-image: 
+      radial-gradient(circle, rgba(255,128,191,0.15) 20%, transparent 20%),
+      url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='120' height='120' viewBox='0 0 100 100'><text x='10' y='30' font-size='22'>✉️</text><text x='60' y='30' font-size='20'>⭐</text><text x='30' y='80' font-size='22'>🌸</text><text x='75' y='80' font-size='20'>💻</text></svg>");
+    color: var(--text-color);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  /* Header Bar */
+  header {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 4px solid #FFD1DC;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .header-title h1 {
+    font-size: 1.2rem;
+    color: var(--primary-pink-dark);
+    font-weight: 900;
+  }
+
+  /* Exercise Tabs Switcher */
+  .passage-tabs {
+    display: flex;
+    gap: 6px;
+  }
+
+  .tab-btn {
+    background: #FFF0F6;
+    border: 2px solid var(--primary-pink);
+    color: var(--primary-pink-dark);
+    padding: 4px 10px;
+    border-radius: 12px;
+    font-weight: 800;
+    font-size: 0.78rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 2px 0 var(--primary-pink);
+  }
+
+  .tab-btn:hover {
+    background: var(--primary-pink);
+    color: white;
+  }
+
+  .tab-btn.active {
+    background: var(--primary-pink-dark);
+    color: white;
+    border-color: var(--primary-pink-dark);
+    box-shadow: 0 2px 0 #D63384;
+  }
+
+  /* Timer Controls */
+  .timer-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #FFF;
+    padding: 6px 16px;
+    border-radius: 50px;
+    border: 3px solid var(--primary-pink);
+    box-shadow: var(--box-shadow-3d);
+  }
+
+  .timer-display {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--primary-pink-dark);
+    min-width: 65px;
+    text-align: center;
+  }
+
+  .btn-timer {
+    background: var(--primary-pink);
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 var(--primary-pink-dark);
+  }
+
+  .btn-timer:hover { transform: translateY(-2px); }
+
+  /* Progress Bar */
+  .progress-container {
+    width: 20%;
+    background: #E9ECEF;
+    height: 16px;
+    border-radius: 10px;
+    overflow: hidden;
+    border: 2px solid #DEE2E6;
+  }
+
+  .progress-bar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #FF80BF, #00D26A);
+    transition: width 0.4s ease;
+    border-radius: 10px;
+  }
+
+  /* Split View Container */
+  .main-container {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .pane {
+    flex: 1;
+    width: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(8px);
+    border-radius: var(--border-radius);
+    padding: 20px;
+    overflow-y: auto;
+    border: 3px solid #FFF;
+    box-shadow: 0 8px 24px rgba(149, 157, 165, 0.15);
+  }
+
+  .passage-content, .exercise-content {
+    display: none;
+  }
+
+  .passage-content.active, .exercise-content.active {
+    display: block;
+  }
+
+  .passage-title {
+    color: var(--primary-pink-dark);
+    font-size: 1.15rem;
+    margin-bottom: 15px;
+    text-align: center;
+    font-weight: 900;
+    border-bottom: 2px dashed var(--primary-pink);
+    padding-bottom: 8px;
+  }
+
+  .paragraph-box {
+    background: #FFF;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 15px;
+    border: 2px solid #FFE4E1;
+    line-height: 1.7;
+    font-size: 0.96rem;
+  }
+
+  .btn-translate {
+    background: #FFF3BF;
+    color: #D9480F;
+    border: 2px solid #FCC419;
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 8px;
+    display: inline-block;
+  }
+
+  .translation-text {
+    display: none;
+    margin-top: 10px;
+    padding: 10px;
+    background: #FFF9DB;
+    border-left: 4px solid #FCC419;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    color: #495057;
+  }
+
+  /* SVG Sign Mockups */
+  .sign-display {
+    text-align: center;
+    margin: 10px 0;
+    padding: 10px;
+    background: #FFF0F6;
+    border: 2px dashed var(--primary-pink);
+    border-radius: 12px;
+  }
+
+  .notice-box {
+    background: #FFF9DB;
+    border: 3px solid #FCC419;
+    border-radius: 12px;
+    padding: 12px 16px;
+    margin: 10px 0;
+    font-weight: 800;
+    text-align: center;
+    color: #D9480F;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+  }
+
+  /* Highlighting */
+  ::selection {
+    background: #D8B4FE;
+    color: #FFF;
+  }
+
+  .highlighted {
+    background-color: #D8B4FE !important;
+    color: white !important;
+    border-radius: 3px;
+    padding: 0 2px;
+  }
+
+  /* Question Cards */
+  .question-card {
+    background: #FFF;
+    border-radius: 15px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 3px solid #F1F3F5;
+    box-shadow: var(--box-shadow-3d);
+  }
+
+  .question-text {
+    font-weight: 800;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+    color: #2D3436;
+  }
+
+  .options-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .option-btn {
+    background: #F8F9FA;
+    border: 2px solid #E9ECEF;
+    padding: 10px 14px;
+    border-radius: 12px;
+    text-align: left;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 3px 0 #DEE2E6;
+    font-size: 0.92rem;
+  }
+
+  .option-btn:hover {
+    background: #FFF0F6;
+    border-color: var(--primary-pink);
+  }
+
+  .option-btn.correct {
+    background: var(--pastel-green) !important;
+    color: white !important;
+    border-color: #00B050 !important;
+    box-shadow: 0 3px 0 #00B050 !important;
+  }
+
+  .option-btn.wrong {
+    background: var(--pastel-red) !important;
+    color: white !important;
+    border-color: #D63031 !important;
+    box-shadow: 0 3px 0 #D63031 !important;
+    animation: shake 0.4s;
+  }
+
+  /* 4-Step Detailed Explanation Box */
+  .explanation-box {
+    display: none;
+    margin-top: 12px;
+    padding: 14px;
+    background: #F0FDF4;
+    border: 2px solid #86EFAC;
+    border-radius: 12px;
+    font-size: 0.88rem;
+    line-height: 1.6;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .exp-step {
+    margin-bottom: 8px;
+  }
+
+  .exp-step:last-child {
+    margin-bottom: 0;
+  }
+
+  .exp-step strong {
+    color: #15803D;
+    font-weight: 800;
+  }
+
+  .locate-btn {
+    background: #E0E7FF;
+    border: 1px solid #818CF8;
+    color: #4338CA;
+    padding: 4px 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 0.78rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 6px;
+  }
+
+  .glossary-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 15px;
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  }
+
+  .glossary-table th, .glossary-table td {
+    padding: 8px 10px;
+    text-align: left;
+    border-bottom: 1px solid #F1F3F5;
+    font-size: 0.85rem;
+  }
+
+  .glossary-table th {
+    background: var(--primary-pink);
+    color: white;
+    font-weight: 800;
+  }
+
+  .submit-container { text-align: center; margin: 20px 0; }
+
+  .btn-submit {
+    background: linear-gradient(135deg, #00D26A, #00B050);
+    color: white;
+    border: none;
+    padding: 12px 35px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 5px 0 #008037;
+    transition: all 0.2s;
+  }
+
+  .btn-submit:hover { transform: translateY(-2px); }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(5px);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .modal-card {
+    background: white;
+    padding: 25px;
+    border-radius: 25px;
+    text-align: center;
+    max-width: 450px;
+    width: 90%;
+    border: 5px solid var(--primary-pink);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+  }
+
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20%, 60% { transform: translateX(-6px); }
+    40%, 80% { transform: translateX(6px); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .target-highlight { animation: flashHighlight 2s ease; }
+
+  @keyframes flashHighlight {
+    0%, 100% { background: transparent; }
+    50% { background: #FDE047; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <div class="header-title">
+      <h1>Ms Lê Hằng English</h1>
+    </div>
+    <div class="passage-tabs">
+      <button class="tab-btn active" onclick="switchPassage(1)">Bài 1: Traditional Letters ✉️</button>
+      <button class="tab-btn" onclick="switchPassage(2)">Bài 2: Health & Tech in Class 🏋️‍♂️</button>
+      <button class="tab-btn" onclick="switchPassage(3)">Bài 3: Signs & Notices 🛑</button>
+    </div>
+  </div>
+
+  <div class="timer-container">
+    <span class="timer-display" id="timerDisplay">20:00</span>
+    <button class="btn-timer" id="timerToggleBtn" onclick="toggleTimer()">BẮT ĐẦU</button>
+  </div>
+
+  <div class="progress-container">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+</header>
+
+<div class="main-container">
+  <!-- LEFT PANE -->
+  <div class="pane" id="leftPane">
+    
+    <!-- PASSAGE 1: TRADITIONAL LETTERS -->
+    <div class="passage-content active" id="passage1">
+      <h2 class="passage-title">READING PASSAGE: TRADITIONAL & MODERN COMMUNICATION</h2>
+      <div class="paragraph-box" id="p_p1">
+        <span id="s_1_1">In the past, Vietnamese people used to send messages by writing letters.</span>
+        <span id="s_1_2">They would carefully express their thoughts on paper, put the letters in envelopes, and send them through the postal service.</span>
+        <span id="s_1_3">Writing letters was a process that took time and patience, but it was deeply appreciated because of the personal touch it offered.</span>
+        <br><br>
+        <span id="s_1_4">Nowadays, things have changed dramatically.</span>
+        <span id="s_1_5">New tools like emails and instant messages have become an <u>integral</u> part of our daily communication.</span>
+        <span id="s_1_6">They offer speed and convenience, allowing people to communicate in real time, irrespective of geographical boundaries.</span>
+        <br><br>
+        <span id="s_1_7">However, some traditions haven't changed completely.</span>
+        <span id="s_1_8">Some people still enjoy writing letters by hand.</span>
+        <span id="s_1_9">They think that handwritten letters are special because they show the writer's feelings, making the communication more personal and sincere.</span>
+        <span id="s_1_10">The time and effort invested in writing each letter add to its emotional value.</span>
+        <br><br>
+        <span id="s_1_11">In summary, even though technology has revolutionised the way we communicate, the tradition of writing letters holds a special place in Vietnamese culture.</span>
+        <span id="s_1_12">People still find something special in putting their thoughts on paper and sending them to others and it creates a personal connection that we cannot do with digital communication.</span>
+        
+        <div>
+          <button class="btn-translate" onclick="toggleTranslation('t_p1')">Mở dịch toàn bài 🌟</button>
+          <div class="translation-text" id="t_p1">Trong quá khứ, người Việt Nam từng gửi tin nhắn bằng cách viết thư. Họ cẩn thận bày tỏ suy nghĩ của mình trên giấy, bỏ thư vào phong bì và gửi qua dịch vụ bưu chính. Viết thư là một quá trình đòi hỏi thời gian và sự kiên nhẫn, nhưng nó được trân trọng sâu sắc vì dấu ấn cá nhân mà nó mang lại. Ngày nay, mọi thứ đã thay đổi đáng kể. Các công cụ mới như email và tin nhắn tức thời đã trở thành một phần thiết yếu trong giao tiếp hàng ngày của chúng ta. Chúng mang lại sự nhanh chóng và tiện lợi, cho phép mọi người giao tiếp theo thời gian thực mà không phụ thuộc vào ranh giới địa lý. Tuy nhiên, một số truyền thống vẫn chưa thay đổi hoàn toàn. Một số người vẫn thích viết thư bằng tay. Họ cho rằng thư tay rất đặc biệt vì chúng thể hiện cảm xúc của người viết, làm cho việc giao tiếp trở nên riêng tư và chân thành hơn. Thời gian và công sức đầu tư vào việc viết mỗi lá thư làm tăng thêm giá trị cảm xúc của nó. Tóm lại, mặc dù công nghệ đã cách mạng hóa cách chúng ta giao tiếp, truyền thống viết thư vẫn giữ một vị trí đặc biệt trong văn hóa Việt Nam. Mọi người vẫn tìm thấy điều gì đó đặc biệt khi gửi gắm suy nghĩ lên trang giấy và gửi cho người khác, tạo nên sự kết nối cá nhân mà giao tiếp kỹ thuật số không thể làm được.</div>
+        </div>
+      </div>
+
+      <h3 class="passage-title" style="font-size: 1rem; margin-top: 20px;">📖 Glossary (Bảng từ vựng B2-C2)</h3>
+      <table class="glossary-table">
+        <thead>
+          <tr><th>Từ vựng</th><th>Loại từ</th><th>Nghĩa tiếng Việt</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Integral</td><td>adj</td><td>Thiết yếu, quan trọng không thể thiếu</td></tr>
+          <tr><td>Irrespective of</td><td>prep</td><td>Bất chấp, không phụ thuộc vào</td></tr>
+          <tr><td>Revolutionise</td><td>v</td><td>Cách mạng hóa, thay đổi toàn diện</td></tr>
+          <tr><td>Sincere</td><td>adj</td><td>Chân thành, thành thật</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- PASSAGE 2: STAYING FIT & TECH IN CLASSROOM -->
+    <div class="passage-content" id="passage2">
+      <h2 class="passage-title">ANNOUNCEMENT & TEXT: HEALTH & EDUCATION</h2>
+      
+      <!-- Announcement -->
+      <div class="paragraph-box" id="p_p2_1">
+        <h3 style="color: var(--primary-pink-dark); margin-bottom: 8px;">Exercise: Staying Fit</h3>
+        <p>1. Exercise <strong>(41) _______</strong> least three times a week.</p>
+        <p>2. Do not skip your warm-up before starting.</p>
+        <p>3. Drink water <strong>(42) _______</strong> your workout.</p>
+        <p>4. <strong>(43) _______</strong> new activities to keep your routine interesting.</p>
+        <p>5. Get enough sleep to recover after exercise.</p>
+        <p>6. If you feel pain, stop <strong>(44) _______</strong> and consult a professional.</p>
+      </div>
+
+      <!-- Text -->
+      <div class="paragraph-box" id="p_p2_2">
+        <h3 style="color: var(--primary-pink-dark); margin-bottom: 8px;">Why We Should Use Technology in the Classroom</h3>
+        <span id="s_2_2_1">Using technology in the classroom has many benefits.</span>
+        <span id="s_2_2_2">First, it helps <strong>(45) _______</strong>. For example, students can use computers or tablets to play educational games, which can make lessons more enjoyable and interactive.</span>
+        <span id="s_2_2_3">Second, technology allows students <strong>(46) _______</strong>. Instead of spending a lot of time searching through books, they can quickly use the internet to find what they need for their projects and homework.</span>
+        <span id="s_2_2_4">Another advantage is that technology helps students <strong>(47) _______</strong>. Some students may understand lessons faster, while others may need more time. With technology, everyone can learn at their own pace and in a way that suits them best.</span>
+        <span id="s_2_2_5">Finally, technology provides teachers with new ways <strong>(48) _______</strong>. Teachers can use apps or online platforms to check students' work and give them advice on how to improve their skills.</span>
+        <div>
+          <button class="btn-translate" onclick="toggleTranslation('t_p2')">Mở dịch bài đọc 🌟</button>
+          <div class="translation-text" id="t_p2">Sử dụng công nghệ trong lớp học mang lại nhiều lợi ích. Thứ nhất, nó giúp thu hút học sinh theo cách năng động hơn. Ví dụ, học sinh có thể sử dụng máy tính hoặc máy tính bảng để chơi các trò chơi giáo dục, làm cho bài học trở nên thú vị và tương tác hơn. Thứ hai, công nghệ cho phép học sinh tìm kiếm và truy cập thông tin nhanh hơn. Thay vì dành nhiều thời gian tìm kiếm trong sách vở, họ có thể nhanh chóng dùng internet để tìm những gì cần thiết cho dự án và bài tập về nhà. Một ưu điểm khác là công nghệ giúp học sinh học theo tốc độ và phong cách riêng của mình. Một số học sinh có thể hiểu bài nhanh hơn, trong khi những người khác cần nhiều thời gian hơn. Cuối cùng, công nghệ cung cấp cho giáo viên những phương pháp mới để đưa ra phản hồi và hướng dẫn hiệu quả. Giáo viên có thể dùng các ứng dụng hoặc nền tảng trực tuyến để kiểm tra bài làm của học sinh và đưa ra lời khuyên cải thiện kỹ năng.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSAGE 3: SIGNS & NOTICES -->
+    <div class="passage-content" id="passage3">
+      <h2 class="passage-title">PRACTICAL ENGLISH: SIGNS & NOTICES</h2>
+      <div class="paragraph-box">
+        <p><strong>Hướng dẫn:</strong> Quan sát kỹ các biển báo giao thông và bảng thông báo ở cột bên phải để chọn phương án giải thích chính xác nhất.</p>
+        <button class="btn-translate" onclick="toggleTranslation('t_p3')">Mở dịch hướng dẫn 🌟</button>
+        <div class="translation-text" id="t_p3">Phần bài tập này kiểm tra kỹ năng đọc hiểu các biển báo giao thông công cộng, biển cấm và các bảng thông báo thực tế trong đời sống hàng ngày.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT PANE -->
+  <div class="pane" id="rightPane">
+    
+    <!-- EXERCISE PART 1: Q26 -> Q30 -->
+    <div class="exercise-content active" id="exercise1">
+      <h2 class="passage-title">✏️ BÀI TẬP: CÂU 26 - 30 (READING COMPREHENSION)</h2>
+
+      <!-- Q26 -->
+      <div class="question-card" id="qCard_26">
+        <div class="question-text">Question 26. What was the traditional method of sending messages in the past, according to the text?</div>
+        <div class="options-grid" id="q_26_options">
+          <button class="option-btn" onclick="checkMCQ('26', this, false)">A. Emails</button>
+          <button class="option-btn" onclick="checkMCQ('26', this, true)">B. Handwritten letters</button>
+          <button class="option-btn" onclick="checkMCQ('26', this, false)">C. Instant messages</button>
+          <button class="option-btn" onclick="checkMCQ('26', this, false)">D. Phone calls</button>
+        </div>
+        <div class="explanation-box" id="exp_26">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Phương thức truyền thống để gửi tin nhắn trong quá khứ theo đoạn văn là gì?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Emails: Thư điện tử.</li>
+              <li>B. Handwritten letters: Thư viết bằng tay.</li>
+              <li>C. Instant messages: Tin nhắn tức thời.</li>
+              <li>D. Phone calls: Các cuộc gọi điện thoại.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn B?</strong> Dẫn chứng ngay câu đầu tiên của bài đọc: "In the past, Vietnamese people used to send messages by writing letters... put the letters in envelopes...".</div>
+          <div class="exp-step"><strong>4. Tại sao A, C, D sai?</strong> Emails và Instant messages là các phương tiện hiện đại (Nowadays); Phone calls không được nhắc đến trong bài. <br><button class="locate-btn" onclick="scrollToElement('s_1_1')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+
+      <!-- Q27 -->
+      <div class="question-card" id="qCard_27">
+        <div class="question-text">Question 27. What is mentioned as a significant aspect of writing letters in the past?</div>
+        <div class="options-grid" id="q_27_options">
+          <button class="option-btn" onclick="checkMCQ('27', this, false)">A. Speed and convenience</button>
+          <button class="option-btn" onclick="checkMCQ('27', this, false)">B. Real-time communication</button>
+          <button class="option-btn" onclick="checkMCQ('27', this, true)">C. Time and patience</button>
+          <button class="option-btn" onclick="checkMCQ('27', this, false)">D. Geographical boundaries</button>
+        </div>
+        <div class="explanation-box" id="exp_27">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Điều gì được nhắc đến như một khía cạnh quan trọng của việc viết thư trong quá khứ?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Speed and convenience: Tốc độ và sự tiện lợi.</li>
+              <li>B. Real-time communication: Giao tiếp theo thời gian thực.</li>
+              <li>C. Time and patience: Thời gian và sự kiên nhẫn.</li>
+              <li>D. Geographical boundaries: Ranh giới địa lý.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn C?</strong> Dẫn chứng dòng 3 đoạn 1: "Writing letters was a process that took time and patience...".</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, D sai?</strong> Speed, convenience và Real-time communication là đặc điểm của công cụ hiện đại (emails/instant messages). <br><button class="locate-btn" onclick="scrollToElement('s_1_3')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+
+      <!-- Q28 -->
+      <div class="question-card" id="qCard_28">
+        <div class="question-text">Question 28. What does the word <u>integral</u> probably mean?</div>
+        <div class="options-grid" id="q_28_options">
+          <button class="option-btn" onclick="checkMCQ('28', this, true)">A. necessary</button>
+          <button class="option-btn" onclick="checkMCQ('28', this, false)">B. easy</button>
+          <button class="option-btn" onclick="checkMCQ('28', this, false)">C. personal</button>
+          <button class="option-btn" onclick="checkMCQ('28', this, false)">D. final</button>
+        </div>
+        <div class="explanation-box" id="exp_28">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Từ <u>integral</u> trong đoạn văn gần nghĩa nhất với từ nào?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. necessary (adj): cần thiết, không thể thiếu (= integral).</li>
+              <li>B. easy (adj): dễ dàng.</li>
+              <li>C. personal (adj): cá nhân.</li>
+              <li>D. final (adj): cuối cùng.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn A?</strong> "Integral" có nghĩa là thiết yếu/quan trọng cấu thành nên một phần không thể thiếu, đồng nghĩa với "necessary".</div>
+          <div class="exp-step"><strong>4. Tại sao B, C, D sai?</strong> B, C, D là các tính từ mang nghĩa khác, không thể thay thế ngữ nghĩa cho "integral". <br><button class="locate-btn" onclick="scrollToElement('s_1_5')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+
+      <!-- Q29 -->
+      <div class="question-card" id="qCard_29">
+        <div class="question-text">Question 29. According to the text, why do some people still prefer writing letters by hand?</div>
+        <div class="options-grid" id="q_29_options">
+          <button class="option-btn" onclick="checkMCQ('29', this, false)">A. It is faster.</button>
+          <button class="option-btn" onclick="checkMCQ('29', this, false)">B. It is more convenient</button>
+          <button class="option-btn" onclick="checkMCQ('29', this, true)">C. It shows the writer's feelings.</button>
+          <button class="option-btn" onclick="checkMCQ('29', this, false)">D. It eliminates geographical boundaries.</button>
+        </div>
+        <div class="explanation-box" id="exp_29">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Theo đoạn văn, tại sao một số người vẫn thích viết thư bằng tay?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Nó nhanh hơn.</li>
+              <li>B. Nó tiện lợi hơn.</li>
+              <li>C. Nó bộc lộ cảm xúc của người viết.</li>
+              <li>D. Nó xóa bỏ ranh giới địa lý.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn C?</strong> Dẫn chứng đoạn 3: "...handwritten letters are special because they show the writer's feelings, making the communication more personal and sincere."</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, D sai?</strong> A, B, D là những lợi thế của công nghệ kỹ thuật số hiện đại. <br><button class="locate-btn" onclick="scrollToElement('s_1_9')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+
+      <!-- Q30 -->
+      <div class="question-card" id="qCard_30">
+        <div class="question-text">Question 30. What is emphasised as unchanged in Vietnamese culture despite technological advancements?</div>
+        <div class="options-grid" id="q_30_options">
+          <button class="option-btn" onclick="checkMCQ('30', this, false)">A. Postal service</button>
+          <button class="option-btn" onclick="checkMCQ('30', this, false)">B. Personal connection</button>
+          <button class="option-btn" onclick="checkMCQ('30', this, false)">C. Digital communication</button>
+          <button class="option-btn" onclick="checkMCQ('30', this, true)">D. Handwritten letters' special value</button>
+        </div>
+        <div class="explanation-box" id="exp_30">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Điều gì được nhấn mạnh là không thay đổi trong văn hóa Việt Nam dù có sự tiến bộ của công nghệ?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Dịch vụ bưu chính.</li>
+              <li>B. Sự kết nối cá nhân.</li>
+              <li>C. Giao tiếp kỹ thuật số.</li>
+              <li>D. Giá trị đặc biệt của truyền thống viết thư tay.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn D?</strong> Dẫn chứng đoạn kết: "...the tradition of writing letters holds a special place in Vietnamese culture. People still find something special in putting their thoughts on paper...".</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, C sai?</strong> Bưu chính đã thay đổi hình thức; B chỉ là một yếu tố nhỏ do thư tay tạo ra; C là sản phẩm của công nghệ mới. <br><button class="locate-btn" onclick="scrollToElement('s_1_11')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXERCISE PART 2: Q41 -> Q48 -->
+    <div class="exercise-content" id="exercise2">
+      <h2 class="passage-title">✏️ BÀI TẬP: CÂU 41 - 48 (ANNOUNCEMENT & CLOZE)</h2>
+
+      <!-- Q41 -->
+      <div class="question-card" id="qCard_41">
+        <div class="question-text">Question 41. Exercise (41) ______ least three times a week.</div>
+        <div class="options-grid" id="q_41_options">
+          <button class="option-btn" onclick="checkMCQ('41', this, false)">A. on</button>
+          <button class="option-btn" onclick="checkMCQ('41', this, true)">B. at</button>
+          <button class="option-btn" onclick="checkMCQ('41', this, false)">C. to</button>
+          <button class="option-btn" onclick="checkMCQ('41', this, false)">D. for</button>
+        </div>
+        <div class="explanation-box" id="exp_41">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Tập thể dục (41) ______ nhất 3 lần một tuần.</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong> Giới từ đi với 'least'.</div>
+          <div class="exp-step"><strong>3. Tại sao chọn B?</strong> Cụm trạng từ cố định: "at least" có nghĩa là ít nhất.</div>
+          <div class="exp-step"><strong>4. Tại sao A, C, D sai?</strong> Cụm từ chuẩn ngữ pháp tiếng Anh duy nhất là "at least".</div>
+        </div>
+      </div>
+
+      <!-- Q42 -->
+      <div class="question-card" id="qCard_42">
+        <div class="question-text">Question 42. Drink water (42) ______ your workout.</div>
+        <div class="options-grid" id="q_42_options">
+          <button class="option-btn" onclick="checkMCQ('42', this, false)">A. before</button>
+          <button class="option-btn" onclick="checkMCQ('42', this, false)">B. after</button>
+          <button class="option-btn" onclick="checkMCQ('42', this, false)">C. with</button>
+          <button class="option-btn" onclick="checkMCQ('42', this, true)">D. during</button>
+        </div>
+        <div class="explanation-box" id="exp_42">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Uống nước (42) ______ trong suốt buổi tập luyện của bạn.</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. before (prep): trước.</li>
+              <li>B. after (prep): sau.</li>
+              <li>C. with (prep): với.</li>
+              <li>D. during (prep): trong suốt thời gian.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn D?</strong> "during your workout" = trong suốt quá trình tập luyện.</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, C sai?</strong> Bổ sung nước cần duy trì xuyên suốt buổi tập chứ không chỉ riêng trước hay sau.</div>
+        </div>
+      </div>
+
+      <!-- Q43 -->
+      <div class="question-card" id="qCard_43">
+        <div class="question-text">Question 43. (43) ______ new activities to keep your routine interesting.</div>
+        <div class="options-grid" id="q_43_options">
+          <button class="option-btn" onclick="checkMCQ('43', this, false)">A. Do</button>
+          <button class="option-btn" onclick="checkMCQ('43', this, false)">B. Play</button>
+          <button class="option-btn" onclick="checkMCQ('43', this, true)">C. Try</button>
+          <button class="option-btn" onclick="checkMCQ('43', this, false)">D. Make</button>
+        </div>
+        <div class="explanation-box" id="exp_43">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> (43) ______ các hoạt động mới để giữ thói quen của bạn luôn thú vị.</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Do (v): làm.</li>
+              <li>B. Play (v): chơi.</li>
+              <li>C. Try (v): thử nghiệm, trải nghiệm.</li>
+              <li>D. Make (v): tạo ra.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn C?</strong> "Try new activities" = Thử nghiệm các hoạt động mới để đổi mới không khí tập luyện.</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, D sai?</strong> Do/Play/Make không đi tự nhiên với 'new activities' trong ngữ cảnh khuyến khích thử thách cái mới.</div>
+        </div>
+      </div>
+
+      <!-- Q44 -->
+      <div class="question-card" id="qCard_44">
+        <div class="question-text">Question 44. If you feel pain, stop (44) ______ and consult a professional.</div>
+        <div class="options-grid" id="q_44_options">
+          <button class="option-btn" onclick="checkMCQ('44', this, false)">A. action</button>
+          <button class="option-btn" onclick="checkMCQ('44', this, false)">B. active</button>
+          <button class="option-btn" onclick="checkMCQ('44', this, true)">C. activity</button>
+          <button class="option-btn" onclick="checkMCQ('44', this, false)">D. act</button>
+        </div>
+        <div class="explanation-box" id="exp_44">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Nếu bạn cảm thấy đau, hãy dừng (44) ______ lại và tham khảo ý kiến chuyên gia.</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. action (n): hành động.</li>
+              <li>B. active (adj): năng động.</li>
+              <li>C. activity (n): hoạt động thể chất/tập luyện.</li>
+              <li>D. act (v/n): hành vi.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn C?</strong> "Stop activity" = dừng hoạt động thể chất/tập luyện đang làm lại.</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, D sai?</strong> Action/Act chỉ hành động chung chung; Active là tính từ không đứng sau 'stop'.</div>
+        </div>
+      </div>
+
+      <!-- Q45 -->
+      <div class="question-card" id="qCard_45">
+        <div class="question-text">Question 45. First, it helps ______.</div>
+        <div class="options-grid" id="q_45_options">
+          <button class="option-btn" onclick="checkMCQ('45', this, false)">A. to find and access information more quickly</button>
+          <button class="option-btn" onclick="checkMCQ('45', this, true)">B. to engage students in a more dynamic way</button>
+          <button class="option-btn" onclick="checkMCQ('45', this, false)">C. to provide feedback and guidance efficiently</button>
+          <button class="option-btn" onclick="checkMCQ('45', this, false)">D. to learn at their own speed and in their own style</button>
+        </div>
+        <div class="explanation-box" id="exp_45">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Đầu tiên, nó giúp (45) ______.</div>
+          <div class="exp-step"><strong>2. Phân tích ngữ cảnh:</strong> Vế sau đưa ra ví dụ chơi trò chơi giáo dục làm bài học sinh động tương tác hơn -> liên quan đến sự tham gia năng động (engage students).</div>
+          <div class="exp-step"><strong>3. Tại sao chọn B?</strong> B phù hợp hoàn toàn với ví dụ "educational games... enjoyable and interactive".</div>
+          <div class="exp-step"><strong>4. Tại sao A, C, D sai?</strong> A phù hợp cho ý thứ 2 (tìm kiếm thông tin); C cho ý giáo viên; D cho ý học theo tốc độ riêng. <br><button class="locate-btn" onclick="scrollToElement('s_2_2_2')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+
+      <!-- Q46 -->
+      <div class="question-card" id="qCard_46">
+        <div class="question-text">Question 46. Second, technology allows students ______.</div>
+        <div class="options-grid" id="q_46_options">
+          <button class="option-btn" onclick="checkMCQ('46', this, true)">A. to find and access information more quickly</button>
+          <button class="option-btn" onclick="checkMCQ('46', this, false)">B. to engage students in a more dynamic way</button>
+          <button class="option-btn" onclick="checkMCQ('46', this, false)">C. to provide feedback and guidance efficiently</button>
+          <button class="option-btn" onclick="checkMCQ('46', this, false)">D. to learn at their own speed and in their own style</button>
+        </div>
+        <div class="explanation-box" id="exp_46">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Thứ hai, công nghệ cho phép học sinh (46) ______.</div>
+          <div class="exp-step"><strong>2. Phân tích ngữ cảnh:</strong> Vế sau giải thích thay vì tìm trong sách thì dùng internet tìm tài liệu nhanh hơn -> chỉ việc truy cập thông tin.</div>
+          <div class="exp-step"><strong>3. Tại sao chọn A?</strong> "to find and access information more quickly" khớp với câu "quickly use the internet to find what they need".</div>
+          <div class="exp-step"><strong>4. Tại sao B, C, D sai?</strong> B, C, D thuộc về các luận điểm lợi ích khác trong bài. <br><button class="locate-btn" onclick="scrollToElement('s_2_2_3')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+
+      <!-- Q47 -->
+      <div class="question-card" id="qCard_47">
+        <div class="question-text">Question 47. Another advantage is that technology helps students ______.</div>
+        <div class="options-grid" id="q_47_options">
+          <button class="option-btn" onclick="checkMCQ('47', this, false)">A. to find and access information more quickly</button>
+          <button class="option-btn" onclick="checkMCQ('47', this, false)">B. to engage students in a more dynamic way</button>
+          <button class="option-btn" onclick="checkMCQ('47', this, false)">C. to provide feedback and guidance efficiently</button>
+          <button class="option-btn" onclick="checkMCQ('47', this, true)">D. to learn at their own speed and in their own style</button>
+        </div>
+        <div class="explanation-box" id="exp_47">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Một ưu điểm khác là công nghệ giúp học sinh (47) ______.</div>
+          <div class="exp-step"><strong>2. Phân tích ngữ cảnh:</strong> Vế sau giải thích người hiểu nhanh người hiểu chậm, mỗi người học theo tốc độ nhịp độ riêng.</div>
+          <div class="exp-step"><strong>3. Tại sao chọn D?</strong> "to learn at their own speed..." tương ứng chính xác với "learn at their own pace and in a way that suits them best".</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, C sai?</strong> A, B, C là nội dung của các đoạn lợi ích khác. <br><button class="locate-btn" onclick="scrollToElement('s_2_2_4')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+
+      <!-- Q48 -->
+      <div class="question-card" id="qCard_48">
+        <div class="question-text">Question 48. Finally, technology provides teachers with new ways ______.</div>
+        <div class="options-grid" id="q_48_options">
+          <button class="option-btn" onclick="checkMCQ('48', this, false)">A. to find and access information more quickly</button>
+          <button class="option-btn" onclick="checkMCQ('48', this, false)">B. to engage students in a more dynamic way</button>
+          <button class="option-btn" onclick="checkMCQ('48', this, true)">C. to provide feedback and guidance efficiently</button>
+          <button class="option-btn" onclick="checkMCQ('48', this, false)">D. to learn at their own speed and in their own style</button>
+        </div>
+        <div class="explanation-box" id="exp_48">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Cuối cùng, công nghệ cung cấp cho giáo viên những phương pháp mới (48) ______.</div>
+          <div class="exp-step"><strong>2. Phân tích ngữ cảnh:</strong> Vế sau nói giáo viên dùng ứng dụng để kiểm tra bài làm và đưa ra lời khuyên (give advice = guidance/feedback).</div>
+          <div class="exp-step"><strong>3. Tại sao chọn C?</strong> "to provide feedback and guidance efficiently" tổng kết chính xác hành động kiểm tra bài và đưa ra lời khuyên cải thiện kỹ năng.</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, D sai?</strong> A, B, D là lợi ích dành cho học sinh, không phải phương pháp làm việc của giáo viên. <br><button class="locate-btn" onclick="scrollToElement('s_2_2_5')">🖱️ Dẫn chứng đoạn văn</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- EXERCISE PART 3: Q49 -> Q55 -->
+    <div class="exercise-content" id="exercise3">
+      <h2 class="passage-title">✏️ BÀI TẬP: CÂU 49 - 55 (SIGNS & NOTICES)</h2>
+
+      <!-- Q49 -->
+      <div class="question-card" id="qCard_49">
+        <div class="question-text">Question 49. Look at this sign. What does it say?</div>
+        <div class="sign-display">
+          <svg width="80" height="80" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="40" fill="#0055A5" stroke="#C00" stroke-width="8"/>
+            <line x1="22" y1="22" x2="78" y2="78" stroke="#C00" stroke-width="8"/>
+            <line x1="78" y1="22" x2="22" y2="78" stroke="#C00" stroke-width="8"/>
+          </svg>
+        </div>
+        <div class="options-grid" id="q_49_options">
+          <button class="option-btn" onclick="checkMCQ('49', this, false)">A. We mustn't park our vehicles here and continue walking.</button>
+          <button class="option-btn" onclick="checkMCQ('49', this, false)">B. We must park our vehicles here and continue walking.</button>
+          <button class="option-btn" onclick="checkMCQ('49', this, false)">C. We can park our vehicles but not start the engine.</button>
+          <button class="option-btn" onclick="checkMCQ('49', this, true)">D. We mustn't stop or park any of our vehicles here.</button>
+        </div>
+        <div class="explanation-box" id="exp_49">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Nhìn vào biển báo này. Nó có nghĩa là gì?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Không được đỗ xe và tiếp tục đi bộ.</li>
+              <li>B. Phải đỗ xe ở đây và tiếp tục đi bộ.</li>
+              <li>C. Có thể đỗ xe nhưng không được nổ máy.</li>
+              <li>D. Không được dừng hoặc đỗ bất kỳ phương tiện nào ở đây.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn D?</strong> Biển báo hình tròn viền đỏ nền xanh có 2 gạch chéo đỏ là biển cấm quốc tế: "Cấm dừng xe và đỗ xe" (No stopping and parking).</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, C sai?</strong> A, B, C giải thích sai quy định hiệu lệnh cấm của biển báo.</div>
+        </div>
+      </div>
+
+      <!-- Q50 -->
+      <div class="question-card" id="qCard_50">
+        <div class="question-text">Question 50. Look at this sign. What does it mean?</div>
+        <div class="sign-display">
+          <svg width="80" height="80" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" fill="none" stroke="#333" stroke-width="6"/>
+            <circle cx="50" cy="25" r="7" fill="#333"/>
+            <path d="M40 38 H60 V60 H40 Z" fill="#333"/>
+            <path d="M62 40 L75 55 L70 60 L58 45 Z" fill="#333"/>
+            <rect x="25" y="55" width="20" height="25" fill="none" stroke="#333" stroke-width="4"/>
+          </svg>
+        </div>
+        <div class="options-grid" id="q_50_options">
+          <button class="option-btn" onclick="checkMCQ('50', this, false)">A. Dropping litter is forbidden.</button>
+          <button class="option-btn" onclick="checkMCQ('50', this, false)">B. Empty the garbage.</button>
+          <button class="option-btn" onclick="checkMCQ('50', this, true)">C. Put the rubbish into the bin.</button>
+          <button class="option-btn" onclick="checkMCQ('50', this, false)">D. No littering.</button>
+        </div>
+        <div class="explanation-box" id="exp_50">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Biển báo này có nghĩa là gì?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Vứt rác bị cấm.</li>
+              <li>B. Đổ rác.</li>
+              <li>C. Hãy bỏ rác vào thùng rác.</li>
+              <li>D. Cấm vứt rác bừa bãi.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn C?</strong> Biển biểu tượng người bỏ rác vào thùng là biển nhắc nhở ý thức công cộng: "Put the rubbish into the bin".</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, D sai?</strong> Không có dấu gạch cấm nên A, D sai; B dùng từ sai nghĩa hướng dẫn.</div>
+        </div>
+      </div>
+
+      <!-- Q51 -->
+      <div class="question-card" id="qCard_51">
+        <div class="question-text">Question 51. What does the sign mean?</div>
+        <div class="sign-display">
+          <svg width="80" height="80" viewBox="0 0 100 100">
+            <rect x="15" y="10" width="70" height="80" fill="none" stroke="#333" stroke-width="4"/>
+            <path d="M25 80 H40 V65 H55 V50 H70 V35" fill="none" stroke="#333" stroke-width="4"/>
+            <circle cx="35" cy="40" r="5" fill="#333"/>
+            <path d="M30 50 L45 35 L55 55" stroke="#333" stroke-width="4" fill="none"/>
+          </svg>
+        </div>
+        <div class="options-grid" id="q_51_options">
+          <button class="option-btn" onclick="checkMCQ('51', this, false)">A. There's a port nearby.</button>
+          <button class="option-btn" onclick="checkMCQ('51', this, true)">B. There's is an overpass for pedestrians ahead.</button>
+          <button class="option-btn" onclick="checkMCQ('51', this, false)">C. Be careful! There're the stairs nearby.</button>
+          <button class="option-btn" onclick="checkMCQ('51', this, false)">D. There's a tunnel at the end of the street.</button>
+        </div>
+        <div class="explanation-box" id="exp_51">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Biển báo này có nghĩa là gì?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Có bến cảng gần đây.</li>
+              <li>B. Phía trước có cầu vượt dành cho người đi bộ.</li>
+              <li>C. Cẩn thận! Có cầu thang gần đây.</li>
+              <li>D. Có đường hầm ở cuối đường.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn B?</strong> Biển chỉ dẫn hình người bước lên cầu thang đi bộ biểu thị cầu vượt sang đường dành cho người đi bộ (Overpass for pedestrians).</div>
+          <div class="exp-step"><strong>4. Tại sao A, C, D sai?</strong> A, C, D không phản ánh đúng ý nghĩa biển chỉ dẫn giao thông này.</div>
+        </div>
+      </div>
+
+      <!-- Q52 -->
+      <div class="question-card" id="qCard_52">
+        <div class="question-text">Question 52. What does the sign mean?</div>
+        <div class="sign-display">
+          <svg width="80" height="80" viewBox="0 0 100 100">
+            <polygon points="50,10 90,80 10,80" fill="none" stroke="#C00" stroke-width="8"/>
+            <path d="M50 32 A15 15 0 1 1 35 50" fill="none" stroke="#333" stroke-width="5"/>
+            <path d="M30 42 L35 50 L42 45" fill="#333"/>
+          </svg>
+        </div>
+        <div class="options-grid" id="q_52_options">
+          <button class="option-btn" onclick="checkMCQ('52', this, false)">A. You are far away from the crossroads.</button>
+          <button class="option-btn" onclick="checkMCQ('52', this, false)">B. You aren't allowed to go at the crossroads.</button>
+          <button class="option-btn" onclick="checkMCQ('52', this, true)">C. There's a crossroads ahead.</button>
+          <button class="option-btn" onclick="checkMCQ('52', this, false)">D. Car isn't allowed to go straight.</button>
+        </div>
+        <div class="explanation-box" id="exp_52">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Biển báo này báo hiệu điều gì?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Bạn đang ở rất xa ngã tư.</li>
+              <li>B. Bạn không được phép đi vào ngã tư.</li>
+              <li>C. Phía trước có nút giao thông/vòng xoay ngã tư giao nhau.</li>
+              <li>D. Ô tô không được phép đi thẳng.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn C?</strong> Biển báo tam giác viền đỏ chứa mũi tên vòng tròn cảnh báo phía trước có nút giao thông giao nhau/vòng xoay (Crossroads / Roundabout ahead).</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, D sai?</strong> A, B, D diễn đạt sai ý nghĩa biển cảnh báo giao thông.</div>
+        </div>
+      </div>
+
+      <!-- Q53 -->
+      <div class="question-card" id="qCard_53">
+        <div class="question-text">Question 53. What does the notice say?</div>
+        <div class="notice-box">
+          🔇 Quiet hours from 10 PM to 7 AM.
+        </div>
+        <div class="options-grid" id="q_53_options">
+          <button class="option-btn" onclick="checkMCQ('53', this, false)">A. You can make noise anytime.</button>
+          <button class="option-btn" onclick="checkMCQ('53', this, false)">B. Quiet hours are only during the day.</button>
+          <button class="option-btn" onclick="checkMCQ('53', this, true)">C. Quiet hours are from 10 PM to 7 AM, keep noise to a minimum.</button>
+          <button class="option-btn" onclick="checkMCQ('53', this, false)">D. Quiet hours are from 7 AM to 10 PM.</button>
+        </div>
+        <div class="explanation-box" id="exp_53">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Thông báo trên cho biết điều gì?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Bạn có thể làm ồn bất kỳ lúc nào.</li>
+              <li>B. Giờ giữ yên tĩnh chỉ diễn ra vào ban ngày.</li>
+              <li>C. Giờ giữ yên tĩnh là từ 10 giờ tối đến 7 giờ sáng, hãy giữ tiếng ồn ở mức tối thiểu.</li>
+              <li>D. Giờ giữ yên tĩnh là từ 7 giờ sáng đến 10 giờ tối.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn C?</strong> Thông báo ghi rõ khung giờ quy định giữ yên tĩnh: "Quiet hours from 10 PM to 7 AM".</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, D sai?</strong> A, B, D ghi sai khung giờ hoặc sai nội dung giữ yên tĩnh.</div>
+        </div>
+      </div>
+
+      <!-- Q54 -->
+      <div class="question-card" id="qCard_54">
+        <div class="question-text">Question 54. What does the notice tell you to do?</div>
+        <div class="notice-box">
+          ATTENTION CUSTOMER<br>
+          This store is now closed.<br>
+          Please visit www.hm.com to find your nearest store
+        </div>
+        <div class="options-grid" id="q_54_options">
+          <button class="option-btn" onclick="checkMCQ('54', this, false)">A. Please visit the website and shop online.</button>
+          <button class="option-btn" onclick="checkMCQ('54', this, false)">B. This store will be moved to the nearest location.</button>
+          <button class="option-btn" onclick="checkMCQ('54', this, false)">C. You should pay attention when you find the nearest store.</button>
+          <button class="option-btn" onclick="checkMCQ('54', this, true)">D. You can visit the website to find the nearest location that is open.</button>
+        </div>
+        <div class="explanation-box" id="exp_54">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Thông báo trên hướng dẫn khách hàng làm gì?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Vui lòng truy cập trang web và mua sắm trực tuyến.</li>
+              <li>B. Cửa hàng này sẽ được chuyển đến vị trí gần nhất.</li>
+              <li>C. Bạn nên chú ý khi tìm cửa hàng gần nhất.</li>
+              <li>D. Bạn có thể truy cập trang web để tìm địa điểm cửa hàng gần nhất đang mở cửa.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn D?</strong> "Please visit www.hm.com to find your nearest store" = Truy cập trang web để tìm vị trí cửa hàng gần nhất.</div>
+          <div class="exp-step"><strong>4. Tại sao A, B, C sai?</strong> Cửa hàng chỉ hướng dẫn truy cập trang web để TÌM CỬA HÀNG MỞ CỬA gần nhất, chứ không bắt buộc mua online hay nói cửa hàng chuyển đi.</div>
+        </div>
+      </div>
+
+      <!-- Q55 -->
+      <div class="question-card" id="qCard_55">
+        <div class="question-text">Question 55. What does the notice say?</div>
+        <div class="notice-box">
+          This week's dance class will be half an hour earlier, at 6.30 p.m. and in room 101, not room 102!<br>
+          Next week's class will be back in room 102 at the usual time.
+        </div>
+        <div class="options-grid" id="q_55_options">
+          <button class="option-btn" onclick="checkMCQ('55', this, false)">A. There won't be a dance class next week.</button>
+          <button class="option-btn" onclick="checkMCQ('55', this, true)">B. The dance class will be somewhere different this week.</button>
+          <button class="option-btn" onclick="checkMCQ('55', this, false)">C. The dance class will only last for half an hour this week.</button>
+          <button class="option-btn" onclick="checkMCQ('55', this, false)">D. There will be a dance class in room 102 at 6.30 p.m. this week.</button>
+        </div>
+        <div class="explanation-box" id="exp_55">
+          <div class="exp-step"><strong>1. Dịch câu hỏi:</strong> Thông báo trên cho biết điều gì?</div>
+          <div class="exp-step"><strong>2. Phân tích 4 đáp án:</strong>
+            <ul>
+              <li>A. Sẽ không có lớp nhảy vào tuần sau.</li>
+              <li>B. Lớp học nhảy sẽ ở một địa điểm khác trong tuần này.</li>
+              <li>C. Lớp học nhảy tuần này chỉ kéo dài trong nửa tiếng.</li>
+              <li>D. Sẽ có lớp học nhảy ở phòng 102 lúc 6h30 chiều tuần này.</li>
+            </ul>
+          </div>
+          <div class="exp-step"><strong>3. Tại sao chọn B?</strong> "This week's dance class will be... in room 101, not room 102!" = Tuần này học ở phòng 101 (địa điểm khác 'somewhere different' so với phòng 102 thường ngày).</div>
+          <div class="exp-step"><strong>4. Tại sao A, C, D sai?</strong> A sai vì tuần sau vẫn học lại bình thường; C sai vì 'half an hour earlier' là bắt đầu sớm hơn nửa tiếng chứ không phải độ dài lớp học; D sai phòng (tuần này học phòng 101).</div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Submit Section -->
+    <div class="submit-container">
+      <button class="btn-submit" onclick="submitExam()">NỘP BÀI TẬP 🚀</button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Kết quả -->
+<div class="modal-overlay" id="resultModal">
+  <div class="modal-card">
+    <h2 style="font-size: 1.8rem; color: var(--primary-pink-dark); margin-bottom: 10px;">🎉 KẾT QUẢ BÀI THI</h2>
+    <p style="font-size: 1.2rem; font-weight: 800; margin-bottom: 15px;" id="scoreText">Bạn đạt: 0 câu đúng</p>
+    <div id="feedbackText" style="font-size: 0.95rem; color: #4B5563; margin-bottom: 20px; font-weight: 700; line-height: 1.5;"></div>
+    <button class="btn-submit" onclick="closeModal()">ĐÓNG & XEM LẠI</button>
+  </div>
+</div>
+
+<script>
+  function switchPassage(passageNum) {
+    document.querySelectorAll('.tab-btn').forEach((btn, index) => {
+      if (index + 1 === passageNum) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    document.querySelectorAll('.passage-content').forEach(el => el.classList.remove('active'));
+    document.getElementById(`passage${passageNum}`).classList.add('active');
+
+    document.querySelectorAll('.exercise-content').forEach(el => el.classList.remove('active'));
+    document.getElementById(`exercise${passageNum}`).classList.add('active');
+  }
+
+  // Web Audio API
+  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  
+  function playSound(type) {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    if (type === 'correct') {
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.3);
+    } else {
+      osc.type = 'sawtooth';
+      osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+      osc.frequency.setValueAtTime(130.81, audioCtx.currentTime + 0.15);
+      gain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.4);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.4);
+    }
+  }
+
+  // Timer Variables
+  let timeLeft = 1200; 
+  let timerInterval = null;
+  let isRunning = false;
+  let answeredQuestions = new Set();
+  let score = 0;
+
+  function updateTimerDisplay() {
+    const minutes = Math.floor(timeLeft / 60);
+    const seconds = timeLeft % 60;
+    document.getElementById('timerDisplay').innerText = 
+      `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+  }
+
+  function toggleTimer() {
+    const btn = document.getElementById('timerToggleBtn');
+    if (!isRunning) {
+      isRunning = true;
+      btn.innerText = "TẠM DỪNG";
+      timerInterval = setInterval(() => {
+        if (timeLeft > 0) {
+          timeLeft--;
+          updateTimerDisplay();
+        } else {
+          clearInterval(timerInterval);
+          alert("Đã hết giờ làm bài, vui lòng nộp bài nhé!");
+          disableInputs();
+        }
+      }, 1000);
+    } else {
+      isRunning = false;
+      btn.innerText = "TIẾP TỤC";
+      clearInterval(timerInterval);
+    }
+  }
+
+  function disableInputs() {
+    document.querySelectorAll('button.option-btn').forEach(el => el.disabled = true);
+  }
+
+  function updateProgress() {
+    const totalCards = document.querySelectorAll('.question-card').length;
+    const percentage = (answeredQuestions.size / totalCards) * 100;
+    document.getElementById('progressBar').style.width = `${percentage}%`;
+  }
+
+  function toggleTranslation(id) {
+    const el = document.getElementById(id);
+    el.style.display = (el.style.display === 'block') ? 'none' : 'block';
+  }
+
+  function checkMCQ(qId, btn, isCorrect) {
+    if (answeredQuestions.has(qId)) return;
+
+    const container = document.getElementById(`q_${qId}_options`);
+    const exp = document.getElementById(`exp_${qId}`);
+    const buttons = container.querySelectorAll('.option-btn');
+    
+    buttons.forEach(b => b.disabled = true);
+
+    if (isCorrect) {
+      btn.classList.add('correct');
+      playSound('correct');
+      confetti({ particleCount: 45, spread: 60, origin: { y: 0.8 } });
+      score++;
+    } else {
+      btn.classList.add('wrong');
+      playSound('wrong');
+      buttons.forEach(b => {
+        if(b.getAttribute('onclick').includes('true')) b.classList.add('correct');
+      });
+    }
+
+    if(exp) exp.style.display = "block";
+    answeredQuestions.add(qId);
+    updateProgress();
+  }
+
+  function scrollToElement(id) {
+    const el = document.getElementById(id);
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      el.classList.add('target-highlight');
+      setTimeout(() => el.classList.remove('target-highlight'), 2000);
+    }
+  }
+
+  document.addEventListener('mouseup', function() {
+    const selection = window.getSelection();
+    if (!selection.isCollapsed) {
+      const range = selection.getRangeAt(0);
+      const span = document.createElement('span');
+      span.className = 'highlighted';
+      range.surroundContents(span);
+      selection.removeAllRanges();
+    }
+  });
+
+  function submitExam() {
+    clearInterval(timerInterval);
+    const modal = document.getElementById('resultModal');
+    const scoreText = document.getElementById('scoreText');
+    const feedbackText = document.getElementById('feedbackText');
+    
+    const totalAnswered = answeredQuestions.size || 1;
+    const percentage = Math.round((score / totalAnswered) * 100);
+    scoreText.innerText = `Bạn đạt: ${score}/${totalAnswered} câu đã làm (${percentage}%)`;
+
+    if (percentage < 50) {
+      feedbackText.innerText = "❤️ Ms Lê Hằng: Điểm lần này chưa cao lắm, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+    } else if (percentage >= 60 && percentage <= 80) {
+      feedbackText.innerText = "👏 Ms Lê Hằng: Con đã có tiến bộ khá ổn rồi, con cố gắng đọc kỹ giải thích đáp án và làm lại nha. Cô tin con sẽ làm tốt hơn ở lần sau!";
+    } else if (percentage >= 90) {
+      feedbackText.innerText = "🌟 Ms Lê Hằng: Làm tốt lắm, con cố gắng rinh điểm 10 ở lần sau nha!";
+      confetti({ particleCount: 150, spread: 100, origin: { y: 0.6 } });
+    } else {
+      feedbackText.innerText = "👍 Con làm khá tốt! Hãy xem kỹ lại các câu sai ở phần giải thích nhé!";
+    }
+
+    modal.style.display = "flex";
+  }
+
+  function closeModal() {
+    document.getElementById('resultModal').style.display = "none";
+  }
+</script>
+</body>
+</html>
